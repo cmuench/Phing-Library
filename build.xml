@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<project name="Phing Task Library Example" default="help">
+	<taskdef file="tasks.properties" />
+	<typedef file="types.properties" />
+
+	<target name="help">
+	</target>
+
+	<target name="soap_example">
+		<soap-client id="stockSoapClient" wsdl="http://www.webservicex.com/stockquote.asmx?WSDL" />
+		<soap-call method="GetQuote" property="my.stock.result">
+			<soap-param name="symbol">1234</soap-param>
+		</soap-call>
+		<echo message="${my.stock.result}" />
+	</target>
+
+</project>
