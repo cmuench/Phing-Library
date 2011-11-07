@@ -98,9 +98,9 @@ class SoapCallTask extends Task
     {
         try {
             $soapClient = $this->soapClient->getClient($this->getProject());
-            $returnValue = call_user_func_array(array($soapClient, $this->method), $this->_getCallParameterArray());
-            var_dump($returnValue);
+            $returnValue = $soapClient->{$this->method}($this->_getCallParameterArray());
             if (is_object($returnValue)) {
+                // @TODO How should be store and access objects as return value?
                 $this->getProject()->setProperty($this->property, json_encode($returnValue));
             } else {
                 $this->getProject()->setProperty($this->property, $returnValue);

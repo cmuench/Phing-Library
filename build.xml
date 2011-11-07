@@ -15,7 +15,7 @@
 
         <soapcall method="GetQuote" property="my.stock.result">
             <soapclient wsdl="http://www.webservicex.com/stockquote.asmx?WSDL"  />
-            <soapparam name="symbol">YAH</soapparam>
+            <soapparam name="symbol">FORD</soapparam>
         </soapcall>
         <echo message="${my.stock.result}" />
     </target>
