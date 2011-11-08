@@ -1,15 +1,21 @@
 <?xml version="1.0"?>
 <project name="Phing Task Library Example" default="help">
+    <taskdef name="jsonquery" classname="tasks.json.JsonPathTask" />
+    <taskdef name="soapcall" classname="tasks.soap.SoapCallTask" />
+    <taskdef name="xpathquery" classname="tasks.xml.XPathQueryTask" />
+    <typedef name="soapclient" classname="types.soap.SoapClientType" />
+    <typedef name="soapparam" classname="types.soap.SoapParamType" />
+
+
     <target name="help">
     </target>
 
+    <!-- Calls SOAP service which returns an XML feed containing stock data. -->
+    <!-- Parses XML stock data with xpath task                               -->
     <target name="soap_example">
         <property name="my.stock.result" value="" />
 
         <!-- Register new soap types -->
-        <taskdef name="soapcall" classname="tasks.soap.SoapCallTask" />
-        <typedef name="soapclient" classname="types.soap.SoapClientType" />
-        <typedef name="soapparam" classname="types.soap.SoapParamType" />
 
         <!--<soapclient id="stockSoapClient" wsdl="http://www.webservicex.com/stockquote.asmx?WSDL" />-->
 
@@ -17,7 +23,16 @@
             <soapclient wsdl="http://www.webservicex.com/stockquote.asmx?WSDL"  />
             <soapparam name="symbol">FORD</soapparam>
         </soapcall>
+        <jsonquery property="my.stock.result" query="$.GetQuoteResult" value="${my.stock.result}" />
+        <xpathquery property="my.stock.result" query="//Last" value="${my.stock.result}" />
         <echo message="${my.stock.result}" />
+    </target>
+
+    <!-- Prints the value of "bar" in simple json string -->
+    <target name="json_query_example">
+        <property name="result" value="" />
+        <jsonquery property="result" query="$.foo.bar" value="{&quot;foo&quot;:{&quot;bar&quot;:23}}" />
+        <echo message="${result}" />
     </target>
 
 </project>

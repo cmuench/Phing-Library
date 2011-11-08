@@ -21,46 +21,51 @@
 require_once 'phing/Task.php';
 
 /**
- * Task to call a remote SOAP webservice
+ * Runs an xpath query on a xml and stores result in a property
  *
  * @author Christian Münch <cmuench@inmon.de>
  */
-class SoapCallTask extends Task
+class XPathQueryTask extends Task
 {
-    /**
-     * @var string
-     */
-    protected $method;
-
-    /**
-     * @var array
-     */
-    protected $params = array();
-
     /**
      * @var string
      */
     protected $property;
 
     /**
-     * @var SoapClientType
+     * @var $query
      */
-    protected $soapClient;
+    protected $query;
 
     /**
-     * @param string $method
+     * @var string
      */
-    public function setMethod($method)
-    {
-        $this->method = $method;
-    }
+    protected $value = '';
 
     /**
-     * @return string
+     * Run query
      */
-    public function getMethod()
+    public function main()
     {
-        return $this->method;
+        if (empty($this->query)) {
+            throw new BuildException('Query (xpath) was not set.');
+        }
+        if (empty($this->value)) {
+            throw new BuildException('No XML was given was value.');
+        }
+        if (empty($this->property)) {
+            throw new BuildException('No property was set.');
+        }
+        try {
+            $xml = simplexml_load_string($this->value);
+            $result = $xml->xpath($this->query);
+            if (count($result) > 1) {
+                throw new BuildException('Query should only return one value. We can only save one value in a property.');
+            }
+            $this->getProject()->setProperty($this->property, (string) $result[0]);
+        } catch (Exception $e) {
+            $this->log($e->getMessage(), Project::MSG_ERR);
+        }
     }
 
     /**
@@ -80,51 +85,45 @@ class SoapCallTask extends Task
     }
 
     /**
-     * Creates internal soap client object
+     * @param string $value
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
+
+    /**
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * Supporting the <xpathquery>value</xpathquery> syntax.
      *
-     *  @return SoapClientType
+     * @param string
+     * @return void
      */
-    public function createSoapclient()
+    public function addText($msg)
     {
-        $this->soapClient = new SoapClientType($this->getProject());
-        return $this->soapClient;
+        $this->value = $msg;
     }
 
     /**
-     * Adds a param for soap call
-     *
-     * @return SoapParamType
+     * @param  $query
      */
-    public function createSoapparam()
+    public function setQuery($query)
     {
-        $param = new SoapParamType($this->getProject());
-        $this->params[] = $param;
-        return $param;
+        $this->query = $query;
     }
 
     /**
-     * @return array
+     * @return
      */
-    protected function _getCallParameterArray()
+    public function getQuery()
     {
-        $array = array();
-        foreach ($this->params as $param) {
-            $array[$param->getName()] = $param->getValue();
-        }
-        return $array;
-    }
-
-    /**
-     * Call soap server
-     */
-    public function main()
-    {
-        try {
-            $soapClient = $this->soapClient->getClient($this->getProject());
-            $result = $soapClient->{$this->method}($this->_getCallParameterArray());
-            $this->getProject()->setProperty($this->property, json_encode($result));
-        } catch (Exception $e) {
-            $this->log($e->getMessage(), Project::MSG_ERR);
-        }
+        return $this->query;
     }
 }
