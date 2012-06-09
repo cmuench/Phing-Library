@@ -23,7 +23,7 @@ require_once 'phing/Task.php';
 /**
  * Task to call a remote SOAP webservice
  *
- * @author Christian Münch <cmuench@inmon.de>
+ * @author Christian Münch <c.muench@netz98.de>
  */
 class SoapCallTask extends Task
 {

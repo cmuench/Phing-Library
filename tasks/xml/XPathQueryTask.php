@@ -23,7 +23,7 @@ require_once 'phing/Task.php';
 /**
  * Runs an xpath query on a xml and stores result in a property
  *
- * @author Christian Münch <cmuench@inmon.de>
+ * @author Christian Münch <c.muench@netz98.de>
  */
 class XPathQueryTask extends Task
 {

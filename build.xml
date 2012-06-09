@@ -1,11 +1,7 @@
 <?xml version="1.0"?>
 <project name="Phing Task Library Example" default="help">
-    <taskdef name="jsonquery" classname="tasks.json.JsonPathTask" />
-    <taskdef name="soapcall" classname="tasks.soap.SoapCallTask" />
-    <taskdef name="xpathquery" classname="tasks.xml.XPathQueryTask" />
-    <typedef name="soapclient" classname="types.soap.SoapClientType" />
-    <typedef name="soapparam" classname="types.soap.SoapParamType" />
 
+    <property name="example.magento.root.dir" value="SET PATH TO YOUR MAGENTO ROOT DIRECTORY" />
 
     <target name="help">
     </target>
@@ -13,6 +9,11 @@
     <!-- Calls SOAP service which returns an XML feed containing stock data. -->
     <!-- Parses XML stock data with xpath task                               -->
     <target name="soap_example">
+        <typedef name="soapparam" classname="types.soap.SoapParamType" />
+        <typedef name="soapclient" classname="types.soap.SoapClientType" />
+        <taskdef name="soapcall" classname="tasks.soap.SoapCallTask" />
+        <taskdef name="xpathquery" classname="tasks.xml.XPathQueryTask" />
+        <taskdef name="jsonquery" classname="tasks.json.JsonPathTask" />
         <property name="my.stock.result" value="" />
 
         <!-- Register new soap types -->
@@ -30,9 +31,49 @@
 
     <!-- Prints the value of "bar" in simple json string -->
     <target name="json_query_example">
+        <taskdef name="jsonquery" classname="tasks.json.JsonPathTask" />
         <property name="result" value="" />
         <jsonquery property="result" query="$.foo.bar" value="{&quot;foo&quot;:{&quot;bar&quot;:23}}" />
         <echo message="${result}" />
+    </target>
+
+    <!-- Generate a local.xml file of magento. Useful during a build in a CI server -->
+    <target name="magento_generate_local_xml_config">
+        <taskdef name="magento-generate-config" classname="tasks.magento.MagentoGenerateLocalXmlConfigTask" />
+        <magento-generate-config
+            dbHost="localhost"
+            dbName="magento-db"
+            dbUser="dbuser"
+            dbPass="secret"
+            sessionSave="db"
+            magentoRoot=""
+        />
+    </target>
+
+    <!-- Clear cache with magento cache api -->
+    <target name="magento_clear_cache">
+        <taskdef name="magento-clear-cache" classname="tasks.magento.MagentoClearCacheTask" />
+        <magento-clear-cache magentoRoot="${example.magento.root.dir}" />
+    </target>
+
+    <!-- Generate a magento test customer -->
+    <target name="magento_generate_test_customers">
+        <taskdef name="magento-customer" classname="tasks.magento.MagentoCustomerTask" />
+        <magento-customer
+            store="default"
+            email="peter.bimbelhuber@example.com"
+            password="test123" firstname="Peter"
+            lastname="Bimbelhuber"
+            magentoRoot="${example.magento.root.dir}"
+        />
+    </target>
+
+    <!-- Echo version number of magento shop -->
+    <target name="magento_version">
+        <taskdef name="magento-version" classname="tasks.magento.MagentoVersionTask" />
+        <property name="magento.version" value="" />
+        <magento-version property="magento.version" magentoRoot="${example.magento.root.dir}" />
+        <echo msg="${magento.version}" />
     </target>
 
 </project>
