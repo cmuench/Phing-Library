@@ -9,7 +9,6 @@ Add the tasks and types to your project. The files should be placed relative to 
 You can start the example build.xml file after cloning the GIT project.
 
 ## Examples
---------
 
 See all example tasks:
 
