@@ -46,7 +46,7 @@
             dbUser="dbuser"
             dbPass="secret"
             sessionSave="db"
-            magentoRoot=""
+            magentoRoot="${example.magento.root.dir}"
         />
     </target>
 
